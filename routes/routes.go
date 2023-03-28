@@ -31,4 +31,7 @@ func LoadRoutes(e *echo.Echo) {
 	// Plan oluştur
 	student.POST("/plan", handlers.CreatePlan())
 
+	// Planları görüntüle
+	student.GET("/plans", handlers.GetPlans())
+
 }
