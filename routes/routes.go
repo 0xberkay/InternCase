@@ -34,4 +34,7 @@ func LoadRoutes(e *echo.Echo) {
 	// Planları görüntüle
 	student.GET("/plans", handlers.GetPlans())
 
+	// Planı görüntüle
+	student.GET("/plan/:id", handlers.GetPlan())
+
 }
