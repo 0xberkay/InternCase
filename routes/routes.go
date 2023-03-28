@@ -28,8 +28,7 @@ func LoadRoutes(e *echo.Echo) {
 	// Öğrenci bilgilerini güncelle
 	student.PUT("/profile", handlers.UpdateStudent())
 
-	// Öğrenci bilgilerini görüntüle
-
-	// Öğrenci bilgilerini sil
+	// Plan oluştur
+	student.POST("/plan", handlers.CreatePlan())
 
 }
