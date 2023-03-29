@@ -27,8 +27,6 @@ func UpdateStudent() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bir hata oluştu"))
 		}
 
-		fmt.Println("ID : ", claims["ID"])
-
 		// Database'den öğrenci bilgilerini çek
 		student := new(models.Student)
 		if err := database.DB.Where("id = ?", claims["ID"]).First(&student).Error; err != nil {
