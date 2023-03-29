@@ -16,7 +16,7 @@ func GetStatuDatas() echo.HandlerFunc {
 		// Plan durumlarını veritabanından çek
 		statuData := new([]models.StatuData)
 		if err := database.DB.Find(&statuData).Error; err != nil {
-			return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
+			return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
 		}
 		return c.JSON(http.StatusOK, statuData)
 

@@ -6,7 +6,7 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-func NewError(err string) *ErrorResponse {
+func ReturnMess(err string) *ErrorResponse {
 	return &ErrorResponse{
 		Message: err,
 	}
