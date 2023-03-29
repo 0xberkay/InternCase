@@ -5,6 +5,7 @@ import (
 	"interncase/models"
 	"interncase/utils"
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
@@ -30,6 +31,14 @@ func CreatePlan() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, utils.NewError(err.Error()))
 		}
 
+		if plan.Start.After(plan.End) {
+			return c.JSON(http.StatusBadRequest, utils.NewError("Başlangıç tarihi bitiş tarihinden sonra olamaz"))
+		}
+
+		if plan.Start.Before(time.Now()) {
+			return c.JSON(http.StatusBadRequest, utils.NewError("Başlangıç tarihi bugünden önce olamaz"))
+		}
+
 		StudentID, ok := claims["ID"]
 		if !ok {
 			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
@@ -46,7 +55,7 @@ func CreatePlan() echo.HandlerFunc {
 		//Eğer plan başka bir planın başka bir plan ile tarih aralığında çakışıyorsa ve kullanıcya aitse
 		//hata mesajı döndür
 		var count int64
-		if err := database.DB.Model(&models.Plan{}).Where("student_id = ?", plan.StudentID).Where("((start_date <= ? AND end_date >= ?) OR (start_date <= ? AND end_date >= ?))", plan.Start, plan.Start, plan.End, plan.End).Count(&count).Error; err != nil {
+		if err := database.DB.Model(&models.Plan{}).Where("student_id = ?", plan.StudentID).Where("((start <= ? AND end >= ?) OR (start <= ? AND end >= ?))", plan.Start, plan.Start, plan.End, plan.End).Count(&count).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
 		}
 		// Planı veritabanına kaydet
