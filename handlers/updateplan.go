@@ -38,14 +38,12 @@ func UpdatePlan() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, utils.ReturnMess("Bu planı güncelleyemezsiniz"))
 		}
 
+		// Planın başlangıç ve bitiş tarihi boş değilse diğer planlarla çakışıyor mu kontrol et
 		if (plan.Start != time.Time{}) || (plan.End != time.Time{}) {
-			var count int64
-			if err := database.DB.Model(&models.Plan{}).Where("student_id = ?", plan.StudentID).Where("((start <= ? AND end >= ?) OR (start <= ? AND end >= ?))", plan.Start, plan.Start, plan.End, plan.End).Count(&count).Error; err != nil {
-				return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
+			if err := database.DB.Where("student_id = ?", StudentID).Where("id != ?", plan.ID).Where("start <= ?", plan.End).Where("end >= ?", plan.Start).First(&plan).Error; err == nil {
+				return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bu plan başka bir planla çakışıyor"))
 			}
-			if count > 0 {
-				return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bu tarihler arasında başka bir planınız var"))
-			}
+
 		}
 
 		// Yeni plan bilgilerini al
