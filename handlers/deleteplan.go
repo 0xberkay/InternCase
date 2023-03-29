@@ -29,10 +29,7 @@ func DeletePlan() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
 		}
 
-		StudentID, ok := claims["ID"]
-		if !ok {
-			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
-		}
+		StudentID := uint(claims["ID"].(float64))
 
 		// Planı öğrenciye ait mi kontrol et
 		if plan.StudentID != StudentID {
