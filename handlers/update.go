@@ -40,8 +40,9 @@ func UpdateStudent() echo.HandlerFunc {
 
 		// Öğrenci bilgilerini kontrol et ve reqiuired ise
 		if err := c.Validate(student); err != nil {
-			return c.JSON(http.StatusBadRequest, utils.ReturnMess(utils.ValidateUpdateError(err.(validator.ValidationErrors))))
-
+			if mess, err := utils.ValidateUpdateError(err.(validator.ValidationErrors)); err != nil {
+				return c.JSON(http.StatusBadRequest, utils.ReturnMess(mess))
+			}
 		}
 
 		// Öğrencinin email adresi daha önce kullanılmış mı?

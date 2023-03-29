@@ -45,8 +45,12 @@ func UpdatePlan() echo.HandlerFunc {
 
 		// Plan bilgilerini kontrol et
 		if err := c.Validate(newPlan); err != nil {
-			return c.JSON(http.StatusBadRequest, utils.ReturnMess(utils.ValidateUpdateError(err.(validator.ValidationErrors))))
+			if mess, err := utils.ValidateUpdateError(err.(validator.ValidationErrors)); err != nil {
+				return c.JSON(http.StatusBadRequest, utils.ReturnMess(mess))
+			}
 		}
+
+		newPlan.ID = plan.ID
 
 		// Planı güncelle
 		if err := database.DB.Model(&plan).Updates(newPlan).Error; err != nil {

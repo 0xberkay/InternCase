@@ -1,6 +1,10 @@
 package utils
 
-import "github.com/go-playground/validator/v10"
+import (
+	"fmt"
+
+	"github.com/go-playground/validator/v10"
+)
 
 type ErrorResponse struct {
 	Message string `json:"message"`
@@ -25,13 +29,15 @@ func ValidateError(err validator.ValidationErrors) string {
 	return message
 }
 
-func ValidateUpdateError(err validator.ValidationErrors) string {
+func ValidateUpdateError(err validator.ValidationErrors) (string, error) {
 	var message string
+	var errData error
 	for _, e := range err {
 		switch e.Tag() {
 		case "email":
 			message = "Geçerli bir email adresi giriniz"
+			errData = fmt.Errorf("email error")
 		}
 	}
-	return message
+	return message, errData
 }

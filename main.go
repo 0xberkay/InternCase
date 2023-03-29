@@ -31,5 +31,5 @@ func main() {
 	routes.LoadRoutes(e)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":3000"))
+	e.Logger.Fatal(e.Start(":3001"))
 }
