@@ -44,6 +44,15 @@ func Connect() {
 		log.Fatalln(err)
 	}
 
+	//Eğer veritabanında statuDatalar yoksa oluştur
+	if err := db.First(&models.StatuData{}).Error; err != nil {
+		for _, v := range models.StatuDataEnums {
+			if err := db.Create(&models.StatuData{StatuName: v}).Error; err != nil {
+				log.Fatalln(err)
+			}
+		}
+	}
+
 	DB = db
 
 }

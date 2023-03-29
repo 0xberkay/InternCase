@@ -37,3 +37,5 @@ type Claims struct {
 	ID uint
 	jwt.RegisteredClaims
 }
+
+var StatuDataEnums = []string{"Yapıldı", "Yapılmadı", "Yapılıyor", "Beklemede", "İptal Edildi"}
