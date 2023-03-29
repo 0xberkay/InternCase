@@ -10,7 +10,7 @@ import (
 )
 
 // GetStatus plan durumunu seçeneklerini görüntüle
-func GetStatus() echo.HandlerFunc {
+func GetStatuDatas() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		// Plan durumlarını veritabanından çek

@@ -43,4 +43,7 @@ func LoadRoutes(e *echo.Echo) {
 	// Planı sil
 	student.DELETE("/plan/:id", handlers.DeletePlan())
 
+	// Statuleri görüntüle
+	student.GET("/statuses", handlers.GetStatuDatas())
+
 }
