@@ -29,7 +29,7 @@ func DeletePlan() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
 		}
 
-		StudentID, ok := claims["ID"].(uint)
+		StudentID, ok := claims["ID"]
 		if !ok {
 			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
 		}

@@ -30,13 +30,15 @@ func CreatePlan() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, utils.NewError(err.Error()))
 		}
 
-		StudentID, ok := claims["ID"].(uint)
+		StudentID, ok := claims["ID"]
 		if !ok {
 			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
 		}
 
-		plan.StudentID = StudentID
+		plan.StudentID = uint(StudentID.(float64))
+
 		// Plan bilgilerini kontrol et
+
 		if err := c.Validate(plan); err != nil {
 			return c.JSON(http.StatusBadRequest, utils.NewError(utils.ValidateError(err.(validator.ValidationErrors))))
 		}
