@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"interncase/database"
 	"interncase/models"
 	"interncase/utils"
@@ -16,9 +15,7 @@ func StudentProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		// JWT'den öğrenci bilgilerini çek
-		//local
 		token, ok := c.Get("user").(*jwt.Token)
-		fmt.Println("Tok", token)
 		if !ok {
 			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
 		}
@@ -26,8 +23,6 @@ func StudentProfile() echo.HandlerFunc {
 		if !ok {
 			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
 		}
-
-		fmt.Println("ID : ", claims["ID"])
 
 		// Database'den öğrenci bilgilerini çek
 		student := new(models.Student)
