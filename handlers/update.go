@@ -27,11 +27,8 @@ func UpdateStudent() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bir hata oluştu"))
 		}
 
-		// Database'den öğrenci bilgilerini çek
-		student := new(models.Student)
-		if err := database.DB.Where("id = ?", claims["ID"]).First(&student).Error; err != nil {
-			return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
-		}
+		var student = new(models.Student)
+		student.ID = uint(claims["ID"].(float64))
 
 		// Öğrenci bilgilerini güncelle
 		if err := c.Bind(student); err != nil {
@@ -45,28 +42,32 @@ func UpdateStudent() echo.HandlerFunc {
 			}
 		}
 
-		// Öğrencinin email adresi daha önce kullanılmış mı?
-		var count int64
-		if err := database.DB.Model(&models.Student{}).Where("email = ?", student.Email).Count(&count).Error; err != nil {
-			return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
+		if student.Email != "" {
+			fmt.Println("Email", student.Email)
+			// Öğrencinin email adresi daha önce kullanılmış mı?
+			var count int64
+			if err := database.DB.Model(&models.Student{}).Where("email = ?", student.Email).Count(&count).Error; err != nil {
+				return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
+			}
+			if count > 0 {
+				return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bu email adresi daha önce kullanılmış"))
+			}
 		}
 
-		if count > 0 {
-			return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bu email adresi daha önce kullanılmış"))
+		if student.Password != "" {
+			// Şifreyi hashle
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(student.Password), bcrypt.DefaultCost)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
+			}
+			student.Password = string(hashedPassword)
 		}
-
-		// Şifreyi hashle
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(student.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
-		}
-		student.Password = string(hashedPassword)
 
 		// Öğrenciyi veritabanına kaydet
-		if err := database.DB.Create(&student).Error; err != nil {
+		if err := database.DB.Updates(&student).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
 		}
 
-		return c.JSON(http.StatusCreated, student)
+		return c.JSON(http.StatusCreated, utils.ReturnMess("Öğrenci bilgileri güncellendi"))
 	}
 }
