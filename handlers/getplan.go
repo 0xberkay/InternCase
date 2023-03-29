@@ -23,10 +23,7 @@ func GetPlan() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
 		}
 
-		StudentID, ok := claims["ID"].(uint)
-		if !ok {
-			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
-		}
+		StudentID := uint(claims["ID"].(float64))
 
 		// Planı veritabanından çek
 		plan := new(models.Plan)
