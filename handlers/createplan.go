@@ -55,9 +55,15 @@ func CreatePlan() echo.HandlerFunc {
 		//Eğer plan başka bir planın başka bir plan ile tarih aralığında çakışıyorsa ve kullanıcya aitse
 		//hata mesajı döndür
 		var count int64
-		if err := database.DB.Model(&models.Plan{}).Where("student_id = ?", plan.StudentID).Where("((start <= ? AND end >= ?) OR (start <= ? AND end >= ?))", plan.Start, plan.Start, plan.End, plan.End).Count(&count).Error; err != nil {
+
+		if err := database.DB.Model(&models.Plan{}).Where("student_id = ?", StudentID).Where("start < ?", plan.End).Where("end > ?", plan.Start).Count(&count).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
 		}
+
+		if count > 0 {
+			return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bu tarih aralığında başka bir planınız var"))
+		}
+
 		// Planı veritabanına kaydet
 		if err := database.DB.Create(&plan).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))

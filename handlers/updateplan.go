@@ -5,6 +5,7 @@ import (
 	"interncase/models"
 	"interncase/utils"
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
@@ -35,6 +36,16 @@ func UpdatePlan() echo.HandlerFunc {
 		// Planın öğrencisi ile JWT'deki öğrenci aynı mı kontrol et
 		if plan.StudentID != StudentID {
 			return c.JSON(http.StatusUnauthorized, utils.ReturnMess("Bu planı güncelleyemezsiniz"))
+		}
+
+		if (plan.Start != time.Time{}) || (plan.End != time.Time{}) {
+			var count int64
+			if err := database.DB.Model(&models.Plan{}).Where("student_id = ?", plan.StudentID).Where("((start <= ? AND end >= ?) OR (start <= ? AND end >= ?))", plan.Start, plan.Start, plan.End, plan.End).Count(&count).Error; err != nil {
+				return c.JSON(http.StatusInternalServerError, utils.ReturnMess(err.Error()))
+			}
+			if count > 0 {
+				return c.JSON(http.StatusBadRequest, utils.ReturnMess("Bu tarihler arasında başka bir planınız var"))
+			}
 		}
 
 		// Yeni plan bilgilerini al
