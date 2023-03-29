@@ -23,16 +23,21 @@ func GetPlans() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
 		}
 
-		StudentID, ok := claims["ID"].(uint)
-		if !ok {
-			return c.JSON(http.StatusBadRequest, utils.NewError("Bir hata oluştu"))
+		StudentID := uint(claims["ID"].(float64))
+
+		plans := new([]models.Plan)
+
+		// Planları veritabanından çek (tarih aralığı varsa)
+		if c.QueryParam("start") != "" && c.QueryParam("end") != "" {
+			if err := database.DB.Where("student_id = ? AND start >= ? AND end <= ?", StudentID, c.QueryParam("start"), c.QueryParam("end")).Find(&plans).Error; err != nil {
+				return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
+			}
+		} else {
+			if err := database.DB.Where("student_id = ?", StudentID).Find(&plans).Error; err != nil {
+				return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
+			}
 		}
 
-		// Planları veritabanından çek
-		plans := new([]models.Plan)
-		if err := database.DB.Where("student_id = ?", StudentID).Find(&plans).Error; err != nil {
-			return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
-		}
 		return c.JSON(http.StatusOK, plans)
 	}
 }
