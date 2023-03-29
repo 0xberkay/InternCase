@@ -29,7 +29,7 @@ func LoadRoutes(e *echo.Echo) {
 	student.PUT("/profile", handlers.UpdateStudent())
 
 	// Plan oluştur
-	student.POST("/plan", handlers.CreatePlan())
+	student.POST("/createplan", handlers.CreatePlan())
 
 	// Planları görüntüle
 	student.GET("/plans", handlers.GetPlans())
@@ -39,5 +39,8 @@ func LoadRoutes(e *echo.Echo) {
 
 	// Planı güncelle
 	student.PUT("/plan/:id", handlers.UpdatePlan())
+
+	// Planı sil
+	student.DELETE("/plan/:id", handlers.DeletePlan())
 
 }

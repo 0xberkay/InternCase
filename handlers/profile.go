@@ -29,6 +29,8 @@ func StudentProfile() echo.HandlerFunc {
 		if err := database.DB.Where("id = ?", claims["ID"]).First(&student).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, utils.NewError(err.Error()))
 		}
+
+		student.Password = ""
 		return c.JSON(http.StatusOK, student)
 	}
 }
